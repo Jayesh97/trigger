@@ -46,7 +46,7 @@ function post_to_botwa(current_project_name,current_build_number, current_build_
     var options = getBotwaOptions();
     //console.log(current_build_number);
     //console.log(options);
-    request.post(botwa_config.url, { json: {build_no:current_build_number,build_status:current_build_status} }, function(error, response, body){
+    request.post(botwa_config.url, { json: {project_name:current_project_name, build_no:current_build_number,build_status:current_build_status} }, function(error, response, body){
         if (error) {
             console.error(error)
             return
@@ -61,9 +61,9 @@ async function get_job_names()
     request(options, function(error, response, body){
         if (!error && response.statusCode == 200) {
             obj = JSON.parse(body);
-            console.log(obj)
+            //console.log(obj)
             for(index in obj.jobs){
-                console.log(obj.jobs[index])
+                //console.log(obj.jobs[index])
             }
           }
         });
@@ -72,7 +72,7 @@ async function get_job_names()
 async function get_job(jobname,endpoint)
 {
     var options = getDefaultOptions(jobname,endpoint);
-    console.log(options);
+    //console.log(options);
     request(options, function(error, response, body){
         //console.log(options)
         if (!error && response.statusCode == 200) {
@@ -89,5 +89,5 @@ async function get_job(jobname,endpoint)
         });
 }
 
-get_job_names()
+//get_job_names()
 get_job(jenkins_config.project_name,"json?pretty=true");
