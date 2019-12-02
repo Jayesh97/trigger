@@ -19,6 +19,19 @@ function getDefaultOptions(jobname,endpoint)
 	return options;
 }
 
+function getDefaultjobOptions(jobname,endpoint)
+{
+	var options = {
+        url: "http://34.67.233.131:8080/api/json?pretty=true"+endpoint,
+        auth:{
+            user : jenkins_config.username,
+            password : jenkins_config.token
+        }
+
+	};
+	return options;
+}
+
 function getBotwaOptions()
 {
     var options = {
@@ -27,18 +40,13 @@ function getBotwaOptions()
     return options;
 }
 
-function getJobsnames()
-{
-    var options = getBotwaOptions();
-    
-}
 
-function post_to_botwa(current_build_number, current_build_status)
+function post_to_botwa(current_project_name,current_build_number, current_build_status)
 {
     var options = getBotwaOptions();
     //console.log(current_build_number);
-    console.log(options);
-    request.post(botwa_config.url, { json: {build_no:"1",build_status:current_build_status} }, function(error, response, body){
+    //console.log(options);
+    request.post(botwa_config.url, { json: {build_no:current_build_number,build_status:current_build_status} }, function(error, response, body){
         if (error) {
             console.error(error)
             return
@@ -46,24 +54,40 @@ function post_to_botwa(current_build_number, current_build_status)
         });
 }
 
-async function get_job(jobname,endpoint)
+
+async function get_job_names()
 {
-    var options = getDefaultOptions(jobname,endpoint);
-    //console.log(options);
+    var options = getDefaultjobOptions();
     request(options, function(error, response, body){
-        //console.log(options)
         if (!error && response.statusCode == 200) {
-            console.log(body)
             obj = JSON.parse(body);
-            current_build_number = obj.lastBuild.number;
-            current_build_status = obj.color;
-            //console.log(current_build_status)
-            //console.log(obj.lastBuild.url);
-            console.log(obj) // Print the json
-            post_to_botwa(current_build_number,current_build_status);
+            console.log(obj)
+            for(index in obj.jobs){
+                console.log(obj.jobs[index])
+            }
           }
         });
 }
 
+async function get_job(jobname,endpoint)
+{
+    var options = getDefaultOptions(jobname,endpoint);
+    console.log(options);
+    request(options, function(error, response, body){
+        //console.log(options)
+        if (!error && response.statusCode == 200) {
+            //console.log(body)
+            obj = JSON.parse(body);
+            current_project_name = jenkins_config.project_name;
+            current_build_number = obj.lastBuild.number;
+            current_build_status = obj.color;
+            //console.log(current_build_status)
+            //console.log(obj.lastBuild.url);
+            //console.log(obj) // Print the json
+            post_to_botwa(current_project_name,current_build_number,current_build_status);
+          }
+        });
+}
 
+get_job_names()
 get_job(jenkins_config.project_name,"json?pretty=true");
