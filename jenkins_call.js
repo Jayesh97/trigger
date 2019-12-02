@@ -73,7 +73,7 @@ async function get_job(jobname,endpoint)
 {
     var options = getDefaultOptions(jobname,endpoint);
     //console.log(options);
-    request(options, function(error, response, body){
+    request(options, async function(error, response, body){
         //console.log(options)
         if (!error && response.statusCode == 200) {
             //console.log(body)
@@ -84,6 +84,7 @@ async function get_job(jobname,endpoint)
             //console.log(current_build_status)
             //console.log(obj.lastBuild.url);
             //console.log(obj) // Print the json
+            await new Promise(resolve => setTimeout(resolve, 5000))
             post_to_botwa(current_project_name,current_build_number,current_build_status);
           }
         });
